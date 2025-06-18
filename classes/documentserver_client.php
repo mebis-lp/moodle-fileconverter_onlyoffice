@@ -57,10 +57,13 @@ class documentserver_client {
     }
 
     public function request_conversion($params) {
-        $endpoint = $this->documentserverhost . '/ConvertService.ashx';
+        $endpoint = $this->documentserverhost . '/converter';
         $callargs = json_encode($params);
+        $documentserversecret = get_config('onlyofficeeditor', 'documentserversecret');
+	    $token = \mod_onlyofficeeditor\jwt_wrapper::encode($params, $documentserversecret);
         $this->curl->setHeader('Content-type: application/json');
         $this->curl->setHeader('Accept: application/json');
+        $this->curl->setHeader('Authorization: Bearer ' . $token);
         $response = $this->curl->post($endpoint, $callargs);
 
         if ($this->curl->errno != 0) {
